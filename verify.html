@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEVS - Decentralized Experience Verification System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 25px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+        .ai-suggestion {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h1 class="display-4 text-white"><i class="fas fa-shield-alt me-3"></i>DEVS</h1>
+            <p class="lead text-white">Decentralized Experience Verification System</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-body p-4">
+                        <ul class="nav nav-tabs mb-4" id="devsTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="verify-tab" data-bs-toggle="tab" data-bs-target="#verify" type="button" role="tab">Verify Experience</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="create-identity-tab" data-bs-toggle="tab" data-bs-target="#create-identity" type="button" role="tab">Create Identity</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="add-experience-tab" data-bs-toggle="tab" data-bs-target="#add-experience" type="button" role="tab">Add Experience</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="ledger-tab" data-bs-toggle="tab" data-bs-target="#ledger" type="button" role="tab">Blockchain Ledger</button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="devsTabContent">
+                            <!-- Verify Experience Tab -->
+                            <div class="tab-pane fade show active" id="verify" role="tabpanel">
+                                <h3><i class="fas fa-search me-2"></i>Verify Experience</h3>
+                                <form id="verifyForm" class="mb-3">
+                                    <div class="mb-3">
+                                        <label for="experienceId" class="form-label">Experience ID</label>
+                                        <input type="text" class="form-control" id="experienceId" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-check-circle me-2"></i>Verify
+                                    </button>
+                                </form>
+                                <div id="verifyResult"></div>
+                            </div>
+
+                            <!-- Create Identity Tab -->
+                            <div class="tab-pane fade" id="create-identity" role="tabpanel">
+                                <h3><i class="fas fa-user-plus me-2"></i>Create Identity</h3>
+                                <form id="identityForm" class="mb-3">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="identityId" class="form-label">Identity ID</label>
+                                            <input type="text" class="form-control" id="identityId" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="identityName" class="form-label">Name</label>
+                                            <input type="text" class="form-control" id="identityName" required>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i>Create Identity
+                                    </button>
+                                </form>
+                                <div id="identityResult"></div>
+                            </div>
+
+                            <!-- Add Experience Tab -->
+                            <div class="tab-pane fade" id="add-experience" role="tabpanel">
+                                <h3><i class="fas fa-plus-circle me-2"></i>Add Experience</h3>
+                                <form id="experienceForm" class="mb-3">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="expId" class="form-label">Experience ID</label>
+                                            <input type="text" class="form-control" id="expId" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="expTitle" class="form-label">Title</label>
+                                            <input type="text" class="form-control" id="expTitle" required>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="expDescription" class="form-label">Description</label>
+                                        <textarea class="form-control" id="expDescription" rows="3" required></textarea>
+                                        <button type="button" class="btn btn-outline-secondary mt-2" id="aiSuggestBtn">
+                                            <i class="fas fa-robot me-2"></i>AI Generate Description
+                                        </button>
+                                    </div>
+                                    <div id="aiSuggestion" class="ai-suggestion" style="display: none;"></div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Add Experience
+                                    </button>
+                                </form>
+                                <div id="experienceResult"></div>
+                            </div>
+
+                            <!-- Blockchain Ledger Tab -->
+                            <div class="tab-pane fade" id="ledger" role="tabpanel">
+                                <h3><i class="fas fa-link me-2"></i>Blockchain Ledger</h3>
+                                <button id="loadLedgerBtn" class="btn btn-primary mb-3">
+                                    <i class="fas fa-download me-2"></i>Load Ledger
+                                </button>
+                                <div id="ledgerResult"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading" id="loading">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Processing...</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        // Utility functions
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showAlert(message, type = 'info') {
+            return `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>`;
+        }
+
+        // AI Description Generator (Mock)
+        async function generateAIDescription(title) {
+            showLoading();
+            // Simulate AI processing
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            hideLoading();
+
+            const suggestions = {
+                'Software Engineer': 'Developed scalable web applications using modern technologies, collaborated with cross-functional teams, and implemented best practices in software development.',
+                'Data Analyst': 'Analyzed large datasets to extract insights, created visualizations and reports, and supported data-driven decision making processes.',
+                'Project Manager': 'Led project teams to successful delivery, managed timelines and budgets, and facilitated communication between stakeholders.',
+                'default': 'Demonstrated expertise in professional development, contributed to team success, and gained valuable experience in the field.'
+            };
+
+            return suggestions[title] || suggestions['default'];
+        }
+
+        // Event Listeners
+        document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const experienceId = document.getElementById('experienceId').value;
+            showLoading();
+
+            try {
+                const response = await fetch(`${API_BASE}/experience/${experienceId}`);
+                const data = await response.json();
+                hideLoading();
+
+                if (response.ok) {
+                    document.getElementById('verifyResult').innerHTML = showAlert(
+                        `<strong>Experience Verified:</strong><br>Title: ${data.title}<br>Description: ${data.description || 'N/A'}`,
+                        'success'
+                    );
+                } else {
+                    document.getElementById('verifyResult').innerHTML = showAlert('Experience not found', 'danger');
+                }
+            } catch (error) {
+                hideLoading();
+                document.getElementById('verifyResult').innerHTML = showAlert('Error verifying experience', 'danger');
+            }
+        });
+
+        document.getElementById('identityForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const identityData = {
+                id: document.getElementById('identityId').value,
+                name: document.getElementById('identityName').value
+            };
+            showLoading();
+
+            try {
+                const response = await fetch(`${API_BASE}/identity`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(identityData)
+                });
+                const data = await response.json();
+                hideLoading();
+
+                if (response.ok) {
+                    document.getElementById('identityResult').innerHTML = showAlert('Identity created successfully!', 'success');
+                } else {
+                    document.getElementById('identityResult').innerHTML = showAlert('Error creating identity', 'danger');
+                }
+            } catch (error) {
+                hideLoading();
+                document.getElementById('identityResult').innerHTML = showAlert('Error creating identity', 'danger');
+            }
+        });
+
+        document.getElementById('experienceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const experienceData = {
+                id: document.getElementById('expId').value,
+                title: document.getElementById('expTitle').value,
+                description: document.getElementById('expDescription').value
+            };
+            showLoading();
+
+            try {
+                const response = await fetch(`${API_BASE}/experience`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(experienceData)
+                });
+                const data = await response.json();
+                hideLoading();
+
+                if (response.ok) {
+                    document.getElementById('experienceResult').innerHTML = showAlert('Experience added successfully!', 'success');
+                } else {
+                    document.getElementById('experienceResult').innerHTML = showAlert('Error adding experience', 'danger');
+                }
+            } catch (error) {
+                hideLoading();
+                document.getElementById('experienceResult').innerHTML = showAlert('Error adding experience', 'danger');
+            }
+        });
+
+        document.getElementById('aiSuggestBtn').addEventListener('click', async () => {
+            const title = document.getElementById('expTitle').value;
+            if (!title) {
+                alert('Please enter a title first');
+                return;
+            }
+
+            const suggestion = await generateAIDescription(title);
+            document.getElementById('aiSuggestion').innerHTML = `<strong>AI Suggestion:</strong> ${suggestion}`;
+            document.getElementById('aiSuggestion').style.display = 'block';
+            document.getElementById('expDescription').value = suggestion;
+        });
+
+        document.getElementById('loadLedgerBtn').addEventListener('click', async () => {
+            showLoading();
+
+            try {
+                const response = await fetch(`${API_BASE}/ledger`);
+                const data = await response.json();
+                hideLoading();
+
+                if (response.ok) {
+                    let ledgerHtml = '<div class="row">';
+                    data.ledger.forEach(block => {
+                        ledgerHtml += `
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Block ${block.index}</h5>
+                                        <p class="card-text"><strong>Hash:</strong> ${block.hash.substring(0, 20)}...</p>
+                                        <p class="card-text"><strong>Data:</strong> ${block.data}</p>
+                                        <p class="card-text"><small class="text-muted">${block.timestamp}</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    ledgerHtml += '</div>';
+                    document.getElementById('ledgerResult').innerHTML = ledgerHtml;
+                } else {
+                    document.getElementById('ledgerResult').innerHTML = showAlert('Error loading ledger', 'danger');
+                }
+            } catch (error) {
+                hideLoading();
+                document.getElementById('ledgerResult').innerHTML = showAlert('Error loading ledger', 'danger');
+            }
+        });
+    </script>
+</body>
+</html>
